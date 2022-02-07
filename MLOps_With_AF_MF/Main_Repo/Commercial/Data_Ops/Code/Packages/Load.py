@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 import sqlite3
 
-Parent = Path(__file__).resolve().parents[5]
+Parent = Path(__file__).resolve().parents[3]
 
 print(Parent)
 db_url= str(Parent)+'/Sqlite/WorkflowDB.db'

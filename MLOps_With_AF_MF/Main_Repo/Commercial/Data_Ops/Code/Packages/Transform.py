@@ -7,7 +7,7 @@ from xverse.transformer import WOE
 
 import sqlite3
 
-Parent = Path(__file__).resolve().parents[5]
+Parent = Path(__file__).resolve().parents[3]
 
 print(Parent)
 db_url= str(Parent)+'/Sqlite/WorkflowDB.db'
@@ -83,7 +83,7 @@ def Transform(raw_df,icd_map_df, cpt_map_df, drg_map_df, tos_map_df, pos_map_df,
     # Modelling
     X_mod = raw_df[feature_cols]
     y_mod = raw_df[target]
-
+    print('mod',X_mod.shape[0])
     if X_mod.shape[0] > 10:
         with cnx:
             cur = cnx.cursor()

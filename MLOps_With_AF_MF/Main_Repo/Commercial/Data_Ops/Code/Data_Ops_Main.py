@@ -11,7 +11,8 @@ import sqlite3
 
 Map_file_name = "ICD_HCPCS_CPT_Codes_Map.xlsx"
 
-Parent = Path(__file__).resolve().parents[4]
+Parent = Path(__file__).resolve().parents[2]
+print(Parent)
 db_url= str(Parent)+'/Sqlite/WorkflowDB.db'
 cnx = sqlite3.connect(db_url)
 Load_df = Load.load_table('Commercial_Historic_Data',"Commercial")
