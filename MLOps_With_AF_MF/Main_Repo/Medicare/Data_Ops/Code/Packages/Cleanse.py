@@ -17,11 +17,11 @@ cnx = sqlite3.connect(db_url)
 def read_files(Map_file_name,LOB):
     try:
 
-        icd_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="ICD-CM-BILL")
-        cpt_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="CPT-CODES")
-        drg_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="DRG")
-        tos_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="TOS-CODES")
-        pos_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="POS-CODES")
+        icd_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="ICD-CM-BILL",engine='openpyxl')
+        cpt_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="CPT-CODES",engine='openpyxl')
+        drg_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="DRG",engine='openpyxl')
+        tos_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="TOS-CODES",engine='openpyxl')
+        pos_map_df = pd.read_excel(str(Parent)+'/Map_Files/' + Map_file_name, sheet_name="POS-CODES",engine='openpyxl')
 
         with cnx:
             cur = cnx.cursor()
