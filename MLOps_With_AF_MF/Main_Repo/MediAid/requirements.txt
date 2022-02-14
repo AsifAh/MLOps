@@ -1,2 +1,5 @@
-pandas==1.1.3
-xverse==1.0.5
+pandas
+xverse
+scikit-learn
+mlflow
+logging
