@@ -7,10 +7,12 @@ from xverse.transformer import WOE
 
 import sqlite3
 
-Parent = Path(__file__).resolve().parents[3]
+Parent = Path(__file__).resolve().parents[5]
 
 print(Parent)
 db_url= str(Parent)+'/Sqlite/WorkflowDB.db'
+db_url_2 = str(Parent)+'/Sqlite/mlops.db'
+cnx2 = sqlite3.connect(db_url_2)
 #process_url = str(Parent)+'/Sqlite/DataOps.db'
 print(db_url)
 
@@ -83,20 +85,22 @@ def Transform(raw_df,icd_map_df, cpt_map_df, drg_map_df, tos_map_df, pos_map_df,
     # Modelling
     X_mod = raw_df[feature_cols]
     y_mod = raw_df[target]
-    print('mod',X_mod.shape[0])
+
     if X_mod.shape[0] > 10:
-        with cnx:
-            cur = cnx.cursor()
-            qry = "UPDATE DataOps SET Timestamp = CURRENT_TIMESTAMP , Run_Status = 1 " \
-                  "where Process_name = 'Transform' and Project_name = '{}'".format(LOB)
+        with cnx2:
+            cur = cnx2.cursor()
+            qry = "UPDATE dataops SET trigger_date_time = CURRENT_TIMESTAMP , run_status  = 1 " \
+                  "where process_name = 'Transform' and workflow_id = '{}'".format(LOB)
             print(qry)
             cur.execute(qry)
     else:
-        with cnx:
-            cur = cnx.cursor()
-            qry = "UPDATE DataOps SET Timestamp = CURRENT_TIMESTAMP , Run_Status = 3 " \
-                  "where Process_name = 'Transform' and Project_name = '{}'".format(LOB)
+        with cnx2:
+            cur = cnx2.cursor()
+            qry = "UPDATE DataOps SET trigger_date_time = CURRENT_TIMESTAMP , Run_Status = 3 " \
+                  "where process_name = 'Transform' and workflow_id = '{}'".format(LOB)
             cur.execute(qry)
+    if cnx2:
+        cnx2.close()
     if cnx:
         cnx.close()
 
