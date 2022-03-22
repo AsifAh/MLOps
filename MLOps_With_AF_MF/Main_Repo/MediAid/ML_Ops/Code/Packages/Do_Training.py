@@ -48,6 +48,7 @@ def eval_metrics(lift_df):
 def do_training(X_train, X_test, y_train, y_test,i):
     mlflow.set_experiment(experiment_name=i)
     experiment = mlflow.get_experiment_by_name(i)
+    print("Name: {}".format(experiment.name))
     print("Experiment_id: {}".format(experiment.experiment_id))
     print("Artifact Location: {}".format(experiment.artifact_location))
     print("Tags: {}".format(experiment.tags))
@@ -61,8 +62,8 @@ def do_training(X_train, X_test, y_train, y_test,i):
     cl5 = AdaBoostClassifier(n_estimators=1000)
     eclf = VotingClassifier(estimators=[
         ('rf', clf2),('gbc',clf3),('mlp',clf4)], voting='soft')
-
-    with mlflow.start_run() as run:
+    print(eclf.get_params(deep=False))
+    with mlflow.start_run(run_name='TEST') as run:
         run_id = run.info.run_id
         eclf.fit(X_train, y_train)
         y_pred = eclf.predict_proba(X_test)[:, 1]
@@ -72,6 +73,8 @@ def do_training(X_train, X_test, y_train, y_test,i):
         lift_df.sort_values('Prob_for_Error',ascending=False,inplace=True)
         lift_df.reset_index(drop=True,inplace=True)
         #lift_df.to_csv('./Buffer_Files/lift.csv')
+
+        mlflow.log_param("estimators",eclf.get_params(deep=False))
 
         (coverage_df, Q1_Coverage, Q2_Coverage, Q3_Coverage) = eval_metrics(lift_df)
         print("  Q1_Coverage: %s" % Q1_Coverage)
