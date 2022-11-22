@@ -17,14 +17,16 @@ cnx2 = sqlite3.connect(db_url_2)
 # Create your connection.
 cnx = sqlite3.connect(db_url)
 
-def load_table(X,Y,LOB,wrk_id):
+def load_table(X,Y,W,LOB,wrk_id):
     X['Project'] = LOB
     Y['Project'] = LOB
     table_name_x = LOB+'_X_Train'
     table_name_y = LOB+'_Y_Train'
+    table_name_w = LOB+'_WOE'
     try :
         X.to_sql(name=table_name_x, con=cnx,index=False,if_exists='replace')
         Y.to_sql(name=table_name_y, con=cnx,index=False,if_exists='replace')
+        W.to_sql(name=table_name_w, con=cnx,index=False,if_exists='replace')
 
         with cnx2:
             cur = cnx2.cursor()

@@ -104,4 +104,4 @@ def Transform(raw_df,icd_map_df, cpt_map_df, drg_map_df, tos_map_df, pos_map_df,
     if cnx:
         cnx.close()
 
-    return X_mod,y_mod
+    return X_mod,y_mod,woe_df
