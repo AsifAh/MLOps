@@ -34,6 +34,3 @@ X_train, X_test, y_train, y_test = train_test_split(X_mod, y_mod, stratify=y_mod
 decile = DT.do_training(X_mod, X_test, y_mod, y_test, LOB)
 
 print(decile)
-
-
-
