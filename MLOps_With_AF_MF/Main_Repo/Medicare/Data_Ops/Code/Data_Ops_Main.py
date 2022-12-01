@@ -35,7 +35,7 @@ qry_clean = "select * from dataops " \
 status = pd.read_sql(qry_clean, cnx2)
 
 if  status[['run_status']].values[0][0] == 1:
-    X_mod,y_mod = Transform.Transform(Load_df, icd_map_df, cpt_map_df, drg_map_df, tos_map_df, pos_map_df, workFlowId)
+    X_mod,y_mod,WOE = Transform.Transform(Load_df, icd_map_df, cpt_map_df, drg_map_df, tos_map_df, pos_map_df, workFlowId)
 else:
     print('no')
 
@@ -45,7 +45,7 @@ qry_trans = "select * from dataops " \
 status = pd.read_sql(qry_trans, cnx2)
 
 if  status[['run_status']].values[0][0] == 1:
-    Status = Ingest.load_table(X_mod,y_mod,'Medicare',workFlowId)
+    Status = Ingest.load_table(X_mod,y_mod,WOE,'Medicare',workFlowId)
 else:
     print('no')
 

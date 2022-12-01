@@ -9,9 +9,6 @@ from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.metrics import f1_score
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_auc_score
 import joblib
 from mlflow.tracking import MlflowClient
 from urllib.parse import parse_qsl, urljoin, urlparse
@@ -47,12 +44,6 @@ def eval_metrics(lift_df):
     coverage_df['Error_cum_percent'] = (coverage_df.Errors_Coverage.cumsum() / coverage_df.Errors_Coverage.sum()) * 100
     return coverage_df,coverage_df['Error_cum_percent'][0],coverage_df['Error_cum_percent'][1],coverage_df['Error_cum_percent'][2]
 
-def mapper(x):
-    if x >0.5 :
-        y = 1
-    else:
-        y = 0
-    return y
 
 def do_training(X_train, X_test, y_train, y_test,i):
     mlflow.set_experiment(experiment_name=i)
@@ -70,41 +61,31 @@ def do_training(X_train, X_test, y_train, y_test,i):
                     hidden_layer_sizes=(5,), random_state=1)
     cl5 = AdaBoostClassifier(n_estimators=1000)
     eclf = VotingClassifier(estimators=[
-        ('lr', clf1),('gbc',clf3),('mlp',clf4)], voting='soft')
+        ('rf', clf2),('gbc',clf3),('mlp',clf4)], voting='soft')
     print(eclf.get_params(deep=False))
-    with mlflow.start_run(run_name=i) as run:
+    with mlflow.start_run(run_name='TEST') as run:
         run_id = run.info.run_id
         eclf.fit(X_train, y_train)
         y_pred = eclf.predict_proba(X_test)[:, 1]
         y_pred_t = eclf.predict_proba(X_train)[:, 1]
-        #y_pred = y_pred.apply(lambda x : 1 if x >0.5 else 0)
-        y_pred = np.array([mapper(xi) for xi in y_pred])
-        y_test = y_test['Error'].apply(lambda x : 1 if x >0.5 else 0)
-
-        roc = roc_auc_score(y_test,y_pred)
-        accuracy = accuracy_score(y_test, y_pred, normalize=False)
-        f1 = f1_score(y_test, y_pred, average='macro')
-
-        '''
         lift_df = pd.DataFrame(y_pred,y_test['Error']).reset_index()
         lift_df.columns = ['Actuals','Prob_for_Error']
         lift_df.sort_values('Prob_for_Error',ascending=False,inplace=True)
         lift_df.reset_index(drop=True,inplace=True)
         #lift_df.to_csv('./Buffer_Files/lift.csv')
-        '''
 
         mlflow.log_param("estimators",eclf.get_params(deep=False))
 
-        #(coverage_df, Q1_Coverage, Q2_Coverage, Q3_Coverage) = eval_metrics(lift_df)
-        print("  roc: %s" % roc)
-        print("  accuracy: %s" % accuracy)
-        print("  f1: %s" % f1)
+        (coverage_df, Q1_Coverage, Q2_Coverage, Q3_Coverage) = eval_metrics(lift_df)
+        print("  Q1_Coverage: %s" % Q1_Coverage)
+        print("  Q2_Coverage: %s" % Q2_Coverage)
+        print("  Q3_Coverage: %s" % Q3_Coverage)
 
         #mlflow.log_param("alpha", alpha)
         #mlflow.log_param("l1_ratio", l1_ratio)
-        mlflow.log_metric("ROC_Area_under_curve", roc)
-        mlflow.log_metric("Accuracy", accuracy)
-        mlflow.log_metric("F1_Score", f1)
+        mlflow.log_metric("Q1_Coverage", Q1_Coverage)
+        mlflow.log_metric("Q2_Coverage", Q2_Coverage)
+        mlflow.log_metric("Q3_Coverage", Q3_Coverage)
 
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
         print(tracking_url_type_store)
@@ -150,9 +131,4 @@ def do_training(X_train, X_test, y_train, y_test,i):
         stage="Staging"
     )
 
-    return art_loc
-
-
-
-
-
+    return coverage_df
